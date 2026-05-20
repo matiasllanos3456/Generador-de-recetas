@@ -1,0 +1,21 @@
+# Estos directorios no se subiran a github
+node_modules/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+build/
+
+# Tooling caches
+.vite/
+.cache/
+
+# Logs
+*.log
+
+# Editor config (opcional)
+.vscode/
