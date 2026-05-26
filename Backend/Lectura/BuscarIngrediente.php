@@ -1,8 +1,12 @@
+<!-- Este script devolverá la informacion especifica de los ingredientes pedidos por el usuario -->
 <!-- En principio la informacion que se manejará
 en este script vendrá de la interfaz de Vue--> 
  <!-- El script de abajo devuelve la información del ingrediente
   por lo que funciona como api, recibe una solicitud http y devuelve json -->
-<!-- Se utilizará la api de usda para obtener la informacion de los alimentos-->
+<!-- -------------------------------------- -->
+
+<!-- Primero se tomará en cuenta la BD para la busqueda de ingredientes,
+    si no se encuentra entonces se consultará a la API de USDA como segunda opcion-->
 <?php
 // Cabeceras obligatorias para que Thunder Client y Vue lo lean como JSON
 header("Content-Type: application/json; charset=UTF-8");
@@ -19,24 +23,64 @@ function cargarEnv($ruta) {
         putenv(trim($nombre) . "=" . trim($valor));
     }
 }
-cargarEnv(__DIR__ . '/.env');
+cargarEnv(__DIR__ . '/../.env');
+
+// Datos de la BD
+$host = getenv('DB_HOST');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
+$name = getenv('DB_NAME');
+$port = getenv('DB_PORT');
 
 // Obtener la API Key de la USDA de forma segura
 $usda_key = getenv('USDA_API_KEY');
-// Api de gemini
-$gemini_key = getenv('GEMINI_API_KEY');
 
-if (!$usda_key || !$gemini_key) {
+if (!$usda_key) {
     echo json_encode(["error" => "Falta la configuración de las API Keys en el archivo .env"]);
     exit;
 }
 // Obtener el ingrediente desde la interfaz (Thuder client en este caso)
-// Aqui se utilizará la api de gemini para traducir el ingrediente ingresado por el usuario
-// en español a ingles para que lo entienda la api de alimentos
 $ingrediente = isset($_GET['search']) ? trim($_GET['search']) : 'milk';
 
 // -----------------------------------------------------
-// Traducir y optimizar con Mymemory API
+// 1) Se consulta a la base de datos
+$mysqli = new mysqli($host, $user, $pass, $name, $port);
+$mysqli->set_charset("utf8mb4");
+
+// Se realizará una consulta preparada para evitar inyecciones de sql
+$query = "SELECT * FROM Ingrediente WHERE nombre LIKE ?";
+$stmt = $mysqli->prepare($query);
+$busqueda_termino = "%" . $ingrediente . "%";
+$stmt->bind_param("s", $busqueda_termino);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+$ingredientesEncontrados = [];
+while ($row = $resultado->fetch_assoc()) {
+    $ingredientesEncontrados[] = [
+        "id"            => (int)$row['id_ingrediente'],
+        "nombre"        => $row['nombre'],
+        "categoria"     => $row['categoria'],
+        "calorias"      => (float)$row['calorias'],
+        "proteinas"     => (float)$row['proteinas'],
+        "carbohidratos" => (float)$row['carbohidratos'],
+        "grasas_sat"    => (float)$row['grasas_saturadas'],
+        "grasas_mono"   => (float)$row['grasas_monoinsaturadas'],
+        "azucares"      => (float)$row['azucares']
+    ];
+}
+$stmt->close();
+
+if ($ingredientesEncontrados) {
+    echo json_encode($ingredientesEncontrados, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+// -----------------------------------------------------
+// Si $ingredientesEncontrados queda vacío (no se encontro nada en la BD)
+// se pasara a buscar por las API de USDA
+
+
+// 2) Traducir y optimizar con Mymemory API
 $ingrediente_url_es = urlencode(strtolower($ingrediente));
 $traductor_url = "https://api.mymemory.translated.net/get?q={$ingrediente_url_es}&langpair=es|en";
 
@@ -53,7 +97,7 @@ $ingrediente_en = isset($json_trans['responseData']['translatedText'])
     : $ingrediente;
 
 // -----------------------------------------------------
-// Extraer el ingrediente base
+// 2.1) Extraer el ingrediente base
 $palabras = explode(' ', $ingrediente_en);
 $ingrediente_base = $palabras[0]; // Nos quedamos solo con "Chicken" o "Milk"
 
@@ -65,7 +109,7 @@ $ingrediente_url = urlencode($ingrediente_base);
 // URL de la USDA filtrando por alimentos comunes (Survey Foods) y limitando a 5 resultados
 $url = "https://api.nal.usda.gov/fdc/v1/foods/search?api_key={$usda_key}&query={$ingrediente_url}&dataType=Survey%20(FNDDS)&pageSize=5";
 
-// Armar el curl (similar al fetch en javascript)
+// 2.2) Armar el curl (similar al fetch en javascript)
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -82,7 +126,7 @@ if(curl_errno($ch)){
 $dataOriginal = json_decode($response, true);
 $productosLimpios = [];
 
-// 4. Mapear los nutrientes específicos de la USDA
+// 2.3) Mapear los nutrientes específicos de la USDA
 if (isset($dataOriginal['foods']) && is_array($dataOriginal['foods'])) {
     foreach ($dataOriginal['foods'] as $food) {
         
