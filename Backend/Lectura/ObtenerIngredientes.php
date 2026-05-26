@@ -33,8 +33,8 @@ if ($mysqli->connect_errno) {
 }
 $mysqli->set_charset("utf8mb4");
 
-// 3. Consultar todos los ingredientes (¡Incluyendo la categoría que agregamos!)
-$query = "SELECT id_ingrediente, nombre, categoria, calorias, proteinas, carbohidratos, grasas_saturadas, grasas_monoinsaturadas, azucares FROM Ingrediente WHERE nombre LIKE '%ano%' ORDER BY categoria";
+// 3. Consultar todos los ingredientes
+$query = "SELECT id_ingrediente, nombre, categoria, calorias, proteinas, carbohidratos, grasas_saturadas, grasas_monoinsaturadas, azucares FROM Ingrediente ORDER BY categoria";
 $resultado = $mysqli->query($query);
 // $mysqli->query($query) devuelve un objeto mysqli_result, imposible de leer por si solo
 // por lo que hay que procesarlo
