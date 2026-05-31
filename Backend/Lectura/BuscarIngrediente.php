@@ -150,11 +150,11 @@ if($internacional){ // Si se habilitó el internacional
                 foreach ($food['foodNutrients'] as $nutrient) {
                     // IDs estándar de la USDA para macros por cada 100g
                     switch ($nutrient['nutrientId']) {
-                        case 1008: $calorias = $nutrient['value']; break; // Energy kcal
-                        case 1003: $proteinas = $nutrient['value']; break; // Protein
-                        case 1005: $carbohidratos = $nutrient['value']; break; // Carbohydrate
-                        case 1004: $grasas = $nutrient['value']; break; // Total lipid (fat)
-                        case 2000: $azucares = $nutrient['value']; break; // Sugars, total
+                        case 1008: $calorias = $nutrient['value']; break;
+                        case 1003: $proteinas = $nutrient['value']; break;
+                        case 1005: $carbohidratos = $nutrient['value']; break; 
+                        case 1004: $grasas = $nutrient['value']; break; 
+                        case 2000: $azucares = $nutrient['value']; break; 
                     }
                 }
             }

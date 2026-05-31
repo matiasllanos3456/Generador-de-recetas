@@ -1,6 +1,6 @@
 <!-- Aqui se retornarán ingredientes comunes
  guardados en la base de datos para mostrar en 
- la interfaz para no depender de la api de USDA -->
+ la interfaz y no depender tanto de la api de USDA -->
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
