@@ -10,7 +10,6 @@
 /*
 {
 "success": true,
-"id_usuario": 14,
 "nombre": "Carlos",
 "peso": 80.0,
 "altura": 1.75
@@ -89,11 +88,13 @@ $stmt->close();
 // Verificar contraseña encriptada
 // password_verify descifra el hash de la BD y lo compara con el password limpio
 if (password_verify($password, $usuario['contrasena'])) {
+    // Se guardará el id en una variable de sesion para utilizarla en otros scripts
+    session_start();
+    $_SESSION['id_usuario'] = (int)$usuario['id_usuario'];
     
     // Se retornará la informacion del usuario en formato json
     echo json_encode([
         "success"    => true,
-        "id_usuario" => (int)$usuario['id_usuario'],
         "nombre"     => $usuario['nombre'],
         "peso"       => $usuario['peso'] !== null ? (float)$usuario['peso'] : 58,
         "altura"     => $usuario['altura'] !== null ? (float)$usuario['altura'] : 1.7
