@@ -40,10 +40,6 @@ $resultado = $mysqli->query($query);
 // por lo que hay que procesarlo
 $catálogo = [];
 while ($row = $resultado->fetch_assoc()) {
-    // fetch_assoc() lo que hace es tomar el primer elemento que está siendo apuntado por un "puntero" en la query (guardada en $resultado)
-    // y la convierte en un array/diccionario de php mas facil de leer
-    // cada atributo queda como una llave y se puede acceder a su valor mas facilmente
-    // luego mueve el puntero a la siguiente fila para tomar el siguiente elemento, esto se debe usar en un bucle.
     $catálogo[] = [
         // Se agrega en forma de objeto de JS al final del array $catalogo
         "id"            => (int)$row['id_ingrediente'],
@@ -61,6 +57,6 @@ while ($row = $resultado->fetch_assoc()) {
 
 $mysqli->close();
 
-// 4. Enviar el catálogo completo de 100 ingredientes a Vue
+// Se envia el catálogo completo de 100 ingredientes a Vue.
 // Lo hace convirtiendo el array en formato json, mas facil de trabajar
 echo json_encode($catálogo, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
