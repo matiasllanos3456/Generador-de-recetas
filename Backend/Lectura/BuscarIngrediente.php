@@ -6,7 +6,7 @@ en este script vendrá de la interfaz de Vue-->
 <!-- -------------------------------------- -->
 
 <!-- Este script recibira 2 valores por parte del usuario:
-    el nombre del ingrediente y la confirmacion para mostrar ingredientes internacionales-->
+    el nombre del ingrediente y la confirmacion para mostrar ingredientes internacionales utilizando la api de USDA-->
 <?php
 // Cabeceras obligatorias para que Thunder Client y Vue lo lean como JSON
 header("Content-Type: application/json; charset=UTF-8");
@@ -73,16 +73,6 @@ while ($row = $resultado->fetch_assoc()) {
 }
 $stmt->close();
 
-// Podría implementar un apartado en la barra de busqueda
-// que habilite o deshabilite las busquedas internacionales (con la api de USDA)
-// En caso de que esté deshabilitada el código finaliza aqui
-// if ($ingredientesEncontrados) {
-//     echo json_encode($ingredientesEncontrados, JSON_UNESCAPED_UNICODE);
-//     exit;
-// }
-// -----------------------------------------------------
-// Si $ingredientesEncontrados queda vacío (no se encontro nada en la BD)
-// se pasara a buscar por las API de USDA
 
 if($internacional){ // Si se habilitó el internacional
     // 2) Traducir y optimizar con Mymemory API

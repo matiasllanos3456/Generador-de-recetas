@@ -37,17 +37,17 @@ $pass = getenv('DB_PASS');
 
 session_start();
 
-// Validamos si el usuario realmente inició sesión antes de hacer nada
-// if (!isset($_SESSION['id_usuario'])) {
-//     echo json_encode(["success" => false, "message" => "No autorizado. Inicia sesión primero."]);
-//     exit;
-// }
-// $id_usuario = $_SESSION['id_usuario'];
+// Validamos si el usuario realmente inició sesión antes de hacer algo
+if (!isset($_SESSION['id_usuario'])) {
+    echo json_encode(["success" => false, "message" => "No autorizado. Inicia sesión primero."]);
+    exit;
+}
+$id_usuario = $_SESSION['id_usuario'];
 // Dejar el id_usuario como 1 para las pruebas y comentar la validacion de arriba
-$id_usuario = 1;
+// $id_usuario = 1;
 
 // -------------------------------------------------------------------------------------------
-// Primero, obtenerer los datos de la interfaz (FastApi Client de momento)
+// Primero, obtener los datos de la interfaz
 $jsonRecibido = file_get_contents("php://input");
 $data = json_decode($jsonRecibido, true);
 
