@@ -109,7 +109,9 @@ Tu respuesta debe ser exclusivamente un objeto JSON válido, sin textos introduc
   \"macronutrientesPorPorcion\": {
     \"calorias\": 477,
     \"proteinas\": 26,
-    \"grasas\": 25,
+    \"grasas saturadas\": 25,
+    \"grasas monoinsaturadas\": 10,
+    \"azucares\": 16,
     \"carbohidratos\": 40
   },
   \"ingredientes con su cantidad\": {
