@@ -91,6 +91,7 @@ if (password_verify($password, $usuario['contrasena'])) {
     // Se guardará el id en una variable de sesion para utilizarla en otros scripts
     session_start();
     $_SESSION['id_usuario'] = (int)$usuario['id_usuario'];
+    $_SESSION['nombre'] = $usuario['nombre'];
     $_SESSION['peso'] = $usuario['peso'] !== null ? (float)$usuario['peso'] : 58;
     $_SESSION['altura'] = $usuario['altura'] !== null ? (float)$usuario['altura'] : 1.7;
     // Se retornará la informacion del usuario en formato json

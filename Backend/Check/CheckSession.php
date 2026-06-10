@@ -10,23 +10,27 @@ header("Content-Type: application/json; charset=UTF-8");
 // Iniciar o reanudar la sesión existente
 session_start();
 
-// Crear el arreglo de respuesta por defecto
-$response = [
-    "success" => false,
-    "usuario" => null
-];
-
-// Preguntar si el ID del usuario ya está guardado en la sesión del servidor
+// Verifica que el id del usuario exista
 if (isset($_SESSION['id_usuario'])) {
-    $response["success"] = true;
-    $response["usuario"] = [
-        "id" => $_SESSION['id_usuario'],
-        "peso" => $_SESSION['peso_usuario'],   // Trae el peso real o el valor por defecto
-        "altura" => $_SESSION['altura_usuario'] // Trae la altura real o el valor por defecto
-    ];
+    echo json_encode([
+        "success" => true,
+        "nombre"  => $_SESSION['nombre'], // Asegúrate de guardar el nombre en la sesión al hacer login
+        "peso"    => $_SESSION['peso'],
+        "altura"  => $_SESSION['altura']
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+} else {
+    echo json_encode(["success" => false]);
+    exit;
 }
-
-// 5. Escupir la respuesta en formato JSON para que Axios la reciba
-echo json_encode($response);
+// Ejemplo de la lista de retorno
+/*
+{
+  "success": true,
+  "id": 5,
+  "peso": 59,
+  "altura": 1.82
+}
+*/
 exit;
  ?>

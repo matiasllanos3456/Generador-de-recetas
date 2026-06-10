@@ -91,8 +91,8 @@ if($stmtInsert->execute()) {
     echo json_encode([
         "success" => true,
         "mensaje" => "Usuario registrado correctamente",
-        "id_usuario" => $mysqli->insert_id
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 } else {
     echo json_encode([
         "error" => "No se pudo registrar al usuario"
