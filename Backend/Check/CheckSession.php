@@ -7,14 +7,13 @@ header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 
-// Iniciar o reanudar la sesión existente
 session_start();
 
 // Verifica que el id del usuario exista
 if (isset($_SESSION['id_usuario'])) {
     echo json_encode([
         "success" => true,
-        "nombre"  => $_SESSION['nombre'], // Asegúrate de guardar el nombre en la sesión al hacer login
+        "nombre"  => $_SESSION['nombre'],
         "peso"    => $_SESSION['peso'],
         "altura"  => $_SESSION['altura']
     ], JSON_UNESCAPED_UNICODE);
