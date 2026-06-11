@@ -13,6 +13,7 @@ session_start();
 if (isset($_SESSION['id_usuario'])) {
     echo json_encode([
         "success" => true,
+        "id_usuario" => $_SESSION['id_usuario'],
         "nombre"  => $_SESSION['nombre'],
         "peso"    => $_SESSION['peso'],
         "altura"  => $_SESSION['altura']

@@ -24,7 +24,7 @@ import {ref, computed} from 'vue';
 import axios from 'axios';
 import { useAuthStore } from './auth';
 
-export const useIngredientesStore = defineStore('ingrdientes', () => {
+export const useIngredientesStore = defineStore('ingredientes', () => {
     // Informacion del usuario
     // Para acceder a los datos: authStore.usuario.altura, authStore.usuario.peso 
     const authStore = useAuthStore();
@@ -33,18 +33,18 @@ export const useIngredientesStore = defineStore('ingrdientes', () => {
     const ingredientesSeleccionados = ref([]);
     const recetaGenerada = ref({ // Se define la forma que tendrá la receta
         titulo: '',
-        ingredientes_ia: [],
+        ingredientes_ia: {},
         tiempo_preparacion: 0.0,
         instrucciones: [], // El paso a paso
         posibles_variaciones: '',
         consejo_nutricional: '',
         macronutrientes: {
-            calorias: "",
-            proteinas: "",
-            carbohidratos: "",
-            grasas_saturadas: "",
-            grasas_monoinsaturadas: "",
-            azucares: ""
+            calorias: 0.0,
+            proteinas: 0.0,
+            carbohidratos: 0.0,
+            grasas_saturadas: 0.0,
+            grasas_monoinsaturadas: 0.0,
+            azucares: 0.0
         }
 
     });
@@ -64,8 +64,9 @@ export const useIngredientesStore = defineStore('ingrdientes', () => {
     agregarIngrediente()
     quitarIngrediente()
     cargarIngredientes(), llamará a ObtenerIngredientes y llenará al estado de listaIngredientes con todos los ingredientes de la BD
-    generarReceta() necesita el peso y la altura del usuario ademas de los ingredientes que fueron seleccionados
+    generarReceta() necesitará el peso y la altura del usuario ademas de los ingredientes que fueron seleccionados
     guardarReceta(), tomará la receta ya generada y la guardara en la BD junto con los ingredientes seleccionados previamente
+    buscarIngrediente(), necesitará el nombre del ingrediente a buscar y una confirmacion true/false si el usuario habilitó la busqueda internacional
     */
     const agregarIngrediente = (ingrediente) => {
         // Primero se valida si el ingrediente no ha sido seleccionado
@@ -153,7 +154,102 @@ export const useIngredientesStore = defineStore('ingrdientes', () => {
             cargando.value = false;
         }
     }
+    // guardarReceta necesitará el id del usuario, los ingredientes seleciconados y la receta
+    const guardarReceta = async () => {
+        if (!authStore.estaAutenticado || !authStore.usuario) {
+            errorMensaje.value = "Debes iniciar sesión para generar una receta adaptada.";
+            return false;
+        }
+        // Si el título está vacío, significa que aún no han generado ninguna receta
+        if (!recetaGenerada.value.titulo) {
+            errorMensaje.value = "No hay ninguna receta activa para guardar.";
+            return false;
+        }
+        cargando.value = true;
+        errorMensaje.value = null;
+        try {
+            const respuesta = await axios.post(
+                'http://localhost/GeneradorDeRecetas/Backend/Process/GuardarReceta.php',
+                // Parametros
+                {
+                    nombre: recetaGenerada.value.titulo || '',
+                    tiempodepreparacion: recetaGenerada.value.tiempo_preparacion || 0.0,
+                    ingredientes_ia: recetaGenerada.value.ingredientes_ia || [],
+                    pasos: recetaGenerada.value.instrucciones || [],
+                    posiblesVariaciones: recetaGenerada.value.posibles_variaciones || '',
+                    consejoNutricional: recetaGenerada.value.consejo_nutricional || '',
+                    macronutrientes: recetaGenerada.value.macronutrientes || {},
+                    ingredientes_usuario: ingredientesSeleccionados.value || []
+                },
+                {withCredentials: true}
+            );
+            if(respuesta.data.success){
+                console.log(respuesta.data.message);
+                return true;
+            } else {
+                errorMensaje.value = respuesta.data.message || "La receta no se pudo guardar";
+                return false;
+            }
+        } catch (error) {
+            console.error("Error al conectar con el archivo de guardado: ", error);
+            errorMensaje.value = "No fue posible guardar la receta. Intentelo nuevamente";
+            return false;
+        } finally {
+            cargando.value = false;
+        }
+    }
+    // esInternacional será un booleano
+    const buscarIngrediente = async (nombreBuscar, esInternacional) => {
+        /* Si esInternacional es falso no se necesitará hacer una solicitud http
+        ya que los ingredientes estan guardados en un estado*/
+        if(!nombreBuscar.trim()){
+            return [];
+        }
+        errorMensaje.value = null;
+        if(!esInternacional) {
+            return listaIngredientes.value.filter(ingrediente =>
+                ingrediente.nombre.toLowerCase().includes(nombreBuscar.toLowerCase())
+            );
+        } 
+        // Si es true se realizará una llamada a BuscarIngrediente.php
+        cargando.value = true;
+        try {
+            // Mandamos los datos mediante un GET
+            const respuesta = await axios.get(
+                'http://localhost/GeneradorDeRecetas/Backend/Lectura/BuscarIngrediente.php',
+                {
+                    params: {
+                        search: nombreBuscar.trim(),
+                        internacional: esInternacional
+                    },
+                    withCredentials: true
+                }
+            );
+            // Si se encuentran los ingredientes se guardan en un array
+            if (respuesta.data && Array.isArray(respuesta.data)) {
+                return respuesta.data;
+            } else if (respuesta.data.success === false) {
+                errorMensaje.value = respuesta.data.message || "No se encontraron ingredientes internacionales.";
+                return [];
+            }
+            return [];
 
+        } catch (error) {
+            console.error("Error en la búsqueda internacional: ", error);
+            errorMensaje.value = "No se pudo conectar con el servicio internacional de alimentos.";
+            return [];
+        } finally {
+            cargando.value = false;
+        }
+        /* Ejemplo de como funcionará este action desde la vista
+            const resultadosBusqueda = ref([]);
+
+            const realizarBusqueda = async () => {
+                // LLamamos al action pasando el texto del input y el estado del botón internacional
+                resultadosBusqueda.value = await ingredientesStore.buscarIngrediente(textoInput.value, checkInternacional.value);
+            };
+        */
+    }
     return {
         listaIngredientes,
         ingredientesSeleccionados,
@@ -163,7 +259,8 @@ export const useIngredientesStore = defineStore('ingrdientes', () => {
         obtenerPorCategoria,
         cargarIngredientes,
         agregarIngrediente,
-        cargarIngredientes,
-        generarReceta
+        generarReceta,
+        guardarReceta,
+        buscarIngrediente
     }
 });
