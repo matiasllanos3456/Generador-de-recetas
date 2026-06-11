@@ -42,7 +42,7 @@ if (!$usda_key) {
 // Obtener el ingrediente desde la interfaz (Thuder client en este caso)
 $ingrediente = isset($_GET['search']) ? trim($_GET['search']) : 'milk';
 // Obtener confirmacion para mostrar ingredientes internacionales (api de USDA)
-$internacional = (isset($_GET['internacional']) && $_GET['internacional'] === 'true');
+$internacional = (isset($_GET['internacional']) && $_GET['internacional'] === true);
 
 // -----------------------------------------------------
 // 1) Se consulta a la base de datos
@@ -74,7 +74,7 @@ while ($row = $resultado->fetch_assoc()) {
 $stmt->close();
 
 
-if($internacional){ // Si se habilitó el internacional
+if($internacional){ // Si se habilitó el internacional se procederá a buscar con la api USDA
     // 2) Traducir y optimizar con Mymemory API
     $ingrediente_url_es = urlencode(strtolower($ingrediente));
     $traductor_url = "https://api.mymemory.translated.net/get?q={$ingrediente_url_es}&langpair=es|en";

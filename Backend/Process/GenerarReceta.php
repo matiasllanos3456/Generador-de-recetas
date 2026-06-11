@@ -114,7 +114,7 @@ Tu respuesta debe ser exclusivamente un objeto JSON válido, sin textos introduc
     \"azucares\": 16,
     \"carbohidratos\": 40
   },
-  \"ingredientes con su cantidad\": {
+  \"ingredientesCantidad\": {
     \"ingrediente 1\": 100, 
     \"ingrediente 2\": 43
   },
@@ -168,14 +168,42 @@ if (empty($respuestaGroq)) {
     echo json_encode(["error" => "No se pudo establecer conexión con el motor de Inteligencia Artificial de Groq. Detalle del error cURL: " . ($ch ? curl_error($ch) : "Límite de reintentos excedido.")]);
     exit;
 }
-// Procesar la respuesta
+// Procesar la respuesta  de groq para trabajarla mas facilmente desde el frontend
 $resultadoDecodificado = json_decode($respuestaGroq, true);
 // Probamos que funcione
-echo json_encode($resultadoDecodificado, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+// echo json_encode($resultadoDecodificado, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+// Contenido del mensaje en json
+$contenidoRecetaTexto = $resultadoDecodificado['choices'][0]['message']['content'] ?? '';
 
-// El script funciona correctamente, ahora solo falta "limpiar" la respuesta
-// para que el script de GuardarReceta.php solo reciba un JSON que pueda procesar facilmente
-// En principio tengo pensado enviar los datos generados en este script y devolverlos al frontend
-// para guardarlos en un estado global, posteriormente si el usuario presiona el boton de guardar
-// se enviarán esos datos al script de guardarReceta.php.
+// Convertir a array asociativo de php
+$recetaObjetoPHP = json_decode($contenidoRecetaTexto, true);
+
+// Verificar que la conversion fue exitosa y retornar
+if ($recetaObjetoPHP) {
+    echo json_encode([
+        "success" => true,
+        "receta"  => $recetaObjetoPHP
+    ], JSON_UNESCAPED_UNICODE);
+} else {
+    echo json_encode([
+        "success" => false,
+        "message" => "La IA devolvió un formato ilegible. Inténtalo de nuevo."
+    ]);
+}
+/*
+Ejemplo de retorno:
+{
+  "success": true,
+  "receta": {
+    "titulo": "Carne Mechada con Papas al Horno",
+    "tiempoPreparacion": "50",
+    "macronutrientesPorPorcion": { ... },
+    "ingredientesCantidad": { ... },
+    "instrucciones": [ ... ],
+    "posiblesVariaciones": "...",
+    "consejoNutricional": "..."
+  }
+}
+*/
+exit;
 ?>

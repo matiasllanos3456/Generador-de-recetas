@@ -97,6 +97,7 @@ if (password_verify($password, $usuario['contrasena'])) {
     // Se retornará la informacion del usuario en formato json
     echo json_encode([
         "success"    => true,
+        "id_usuario" => (int)$usuario['id_usuario'],
         "nombre"     => $usuario['nombre'],
         "peso"       => $usuario['peso'] !== null ? (float)$usuario['peso'] : 58,
         "altura"     => $usuario['altura'] !== null ? (float)$usuario['altura'] : 1.7

@@ -38,11 +38,12 @@ export const useAuthStore = defineStore('usuario', () => {
         try {
             const respuesta = await axios.post(
                 'http://localhost/GeneradorDeRecetas/Backend/Process/LogIn.php',
-            {email, password}, // Datos que recibirá el php
-            {withCredentials: true});
+                {email, password}, // Datos que recibirá el php
+                {withCredentials: true});
             if (respuesta.data.success){
                 // Si la respuesta es exitosa guardamos al usuario en formato json
                 usuario.value = {
+                    id_usuario: respuesta.data.id_usuario,
                     nombre: respuesta.data.nombre,
                     peso: respuesta.data.peso,
                     altura: respuesta.data.altura
@@ -75,6 +76,7 @@ export const useAuthStore = defineStore('usuario', () => {
             );
             if (respuesta.data.success){
                 usuario.value = {
+                    id_usuario: respuesta.data.id_usuario,
                     nombre: respuesta.data.nombre,
                     peso: respuesta.data.peso,
                     altura: respuesta.data.altura
@@ -107,7 +109,6 @@ export const useAuthStore = defineStore('usuario', () => {
             if (respuesta.data.success){
                 // Si la respuesta es exitosa procedemos a iniciar sesion con el metodo antes definido
                 const exitologin = await login(email, password);
-                estaAutenticado.value = true;
                 // Deberia retornar true
                 return exitologin;
             } else {

@@ -88,7 +88,7 @@ $query_insercion = "INSERT INTO ingrediente (nombre, calorias, proteinas, carboh
 
 $mysqli = new mysqli($host, $user, $pass, $name, $port);
 if ($mysqli->connect_errno) {
-    echo json_encode(["error" => "Error de conexión: " . $mysqli->connect_error]);
+    echo json_encode(["success" => false, "message" => "Error de conexión: " . $mysqli->connect_error]);
     exit;
 }
 $mysqli->set_charset("utf8mb4");
@@ -114,7 +114,8 @@ foreach($ingredientes_usuario as $ingrediente){
                                     $grasas_mon, $azucares, $categoria);
         if(!$stmt_insertar->execute()){
             echo json_encode([
-                "error" => "No se pudo registrar el ingrediente " . $nombre_revisado
+                "success" => false,
+                "message" => "No se pudo registrar el ingrediente " . $nombre_revisado
             ]);
             exit;
         } else {
@@ -132,7 +133,8 @@ $stmt_receta = $mysqli->prepare($query_receta);
 $stmt_receta->bind_param("isdss", $id_usuario, $nombre_receta, $tiempo, $atributo_pasos_final, $macronutrientes);
 if(!$stmt_receta->execute()){
     echo json_encode([
-        "error" => "No se pudo guardar la receta de " . $nombre_receta
+        "success" => false,
+        "message" => "No se pudo guardar la receta de " . $nombre_receta
     ]);
     exit;
 } else {
@@ -157,7 +159,8 @@ foreach($lista_ids_productos as $id_prod){
     // Se notifiacará si hay un error al insertar
     if(!$stmt_intermedio->execute()){
         echo json_encode([
-            "error" => "No se pudo guardar el indrediente de id " . $id_prod
+            "success" => false,
+            "message" => "No se pudo guardar el indrediente de id " . $id_prod
     ]);
     exit;
 }
