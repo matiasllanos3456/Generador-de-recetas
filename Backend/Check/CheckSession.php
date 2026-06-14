@@ -5,8 +5,12 @@
 // Permitir que Vue (en localhost:5173) lea este script y comparta cookies
 header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");
-header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit(0);
+}
 session_start();
 
 // Verifica que el id del usuario exista

@@ -1,13 +1,14 @@
-<!-- Como se está trabajando con Api rest no se utilizarán
+<?php
+/*-- Como se está trabajando con Api rest no se utilizarán
  variables como $_SESSION para mantenerlo sin estado,
  esto hace al programa mas eficiente, escalable y seguro al no guardar
  en memoria la informacion de cientos y miles de usuarios en el mismo sitio-->
-<!-- El frontend (Vue) será quien recuerde al usuario en sesion -->
-<?php
-// Se recibirá el correo y la contraseña para iniciar sesion
-// Si se encuentra al usuario en la BD, el script devolverá los datos del usuario
-// en formato json, ejemplo:
-/*
+ El frontend (Vue) será quien recuerde al usuario en sesion -->
+
+ Se recibirá el correo y la contraseña para iniciar sesion
+ Si se encuentra al usuario en la BD, el script devolverá los datos del usuario
+ en formato json, ejemplo:
+
 {
 "success": true,
 "nombre": "Carlos",
@@ -18,10 +19,16 @@
 // Los cuales serán enviados al frontend y guardados
 // en un estado global de pinia
 
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit(0);
+}
+
+session_start();
 
 // Cargar variables de entorno (subiendo un nivel para buscar el .env)
 function cargarEnv($ruta) {
@@ -57,7 +64,7 @@ $pass = getenv('DB_PASS');
 
 $mysqli = new mysqli($host, $user, $pass, $name, $port);
 if ($mysqli->connect_errno) {
-    echo json_encode(["error" => "Error de conexión: " . $mysqli->connect_error]);
+    echo json_encode(["success" => false, "error" => "Error de conexión: " . $mysqli->connect_error]);
     exit;
 }
 $mysqli->set_charset("utf8mb4");
@@ -74,7 +81,7 @@ $resultado = $stmt->get_result();
 
 // Si no encuentra ninguna fila, el correo no existe
 if ($resultado->num_rows === 0) {
-    echo json_encode(["error" => "El correo electrónico o la contraseña son incorrectos."]);
+    echo json_encode(["success" => false, "error" => "El correo electrónico o la contraseña son incorrectos."]);
     $stmt->close();
     $mysqli->close();
     exit;
@@ -84,12 +91,24 @@ if ($resultado->num_rows === 0) {
 $usuario = $resultado->fetch_assoc();
 $stmt->close();
 
+// --------Prueba -----------
+/* Prueba de descarte temporal
+echo json_encode([
+    "success" => false,
+    "debug_correo_recibido" => $email,
+    "debug_clave_recibida" => $password,
+    "debug_hash_de_la_bd" => $usuario['contrasena'] ?? '⚠️ LA COLUMNA contrasena NO EXISTE EN TU TABLA O ESTÁ VACÍA'
+]);
+exit;
+*/
+// --------Prueba -----------
+// Remover caracteres que causan conflicto en la contraseña
+$hashLimpio = stripslashes($usuario['contrasena']);
 // ---------------------------------------------------------
 // Verificar contraseña encriptada
 // password_verify descifra el hash de la BD y lo compara con el password limpio
-if (password_verify($password, $usuario['contrasena'])) {
+if (password_verify($password, $hashLimpio)) {
     // Se guardará el id en una variable de sesion para utilizarla en otros scripts
-    session_start();
     $_SESSION['id_usuario'] = (int)$usuario['id_usuario'];
     $_SESSION['nombre'] = $usuario['nombre'];
     $_SESSION['peso'] = $usuario['peso'] !== null ? (float)$usuario['peso'] : 58;
@@ -106,7 +125,7 @@ if (password_verify($password, $usuario['contrasena'])) {
 } else {
     // Nota de seguridad: Se da el mismo mensaje que si el correo no existiera 
     // para que un atacante no sepa si adivinó el correo válido.
-    echo json_encode(["error" => "El correo electrónico o la contraseña son incorrectos."]);
+    echo json_encode(["success" => false, "error" => "El correo electrónico o la contraseña son incorrectos."]);
 }
 
 $mysqli->close();

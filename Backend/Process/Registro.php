@@ -1,12 +1,17 @@
-<!-- Este script recibirá por un metodo POST
- los datos del usario desde la interfaz (Thunder client),
- realizará las validaciones y creará la instancia en la BD -->
 <?php
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
+/*
+ Este script recibirá por un metodo POST
+ los datos del usario desde la interfaz (Thunder client),
+ realizará las validaciones y creará la instancia en la BD 
+*/
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit(0);
+}
 // 1. Cargar variables de entorno
 function cargarEnv($ruta) {
     if (!file_exists($ruta)) return;
@@ -29,9 +34,10 @@ $pass = getenv('DB_PASS');
 // mysqli() permite establecer una conexion a la BD
 // la cual será guardada en $mysqli que se utilizara
 // para hacer las consultas
+mysqli_report(MYSQLI_REPORT_OFF);
 $mysqli = new mysqli($host, $user, $pass, $name, $port);
 if ($mysqli->connect_errno) {
-    echo json_encode(["error" => "Error de conexión: " . $mysqli->connect_error]);
+    echo json_encode(["sucess" => false, "error" => "Error de conexión: " . $mysqli->connect_error]);
     exit;
 }
 // utf8mb4 permite el rederizar caracteres especiales
@@ -51,8 +57,8 @@ if(strlen($password) < 8) {
 }
 
 // Campos opcionales
-$altura = (isset($datosRecibidos['altura']) && $datosRecibidos['altura'] !== "") ? (float)$datosRecibidos['altura'] : 1.7;
-$peso   = (isset($datosRecibidos['peso']) && $datosRecibidos['peso'] !== "") ? (float)$datosRecibidos['peso'] : 58;
+$altura = (!empty($datosRecibidos['altura'])) ? (float)$datosRecibidos['altura'] : 1.7;
+$peso   = (!empty($datosRecibidos['peso']))   ? (float)$datosRecibidos['peso']   : 58;
 
 // Validaciones
 if (empty($nombre) || empty($email) || empty($password)) {
