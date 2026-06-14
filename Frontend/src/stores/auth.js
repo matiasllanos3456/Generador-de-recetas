@@ -15,20 +15,27 @@ import {ref, computed} from 'vue';
 import axios from 'axios';
 
 export const useAuthStore = defineStore('usuario', () => {
-    const usuario = ref(null)
+    const usuario = ref(JSON.parse(localStorage.getItem('usuario_sesion')) || null);
     // Si el usuario se encontro en la BD esta constante pasará a true,
     // esto servirá para rederigir al usuario a la pagina principal
-    const estaAutenticado = ref(false)
+    const estaAutenticado = ref(!!usuario.value)
     
     // Estados de control
     const cargando = ref(false)
     const errorMensaje = ref(null)
-    // Getters: ObtenerDatosIMC(): Devuelve la altura y el peso para ser utilizados en el storage de ingredientes.js
 
+    // Getters: datosIMC(): Devuelve la altura y el peso para ser utilizados en el storage de ingredientes.js
+    const datosIMC = computed(() => {
+        return {
+            peso: usuario.value?.peso || 0,
+            altura: usuario.value?.altura || 0
+        };
+    });
     /*
     Actions: - IniciarSesion(correo, contraseña)
     - Registrarse(nombre, correo, contraseña, peso, altura). Al registrarse se iniciará sesion automaticamente
     - ChequearSesion() 
+    - logout(), cierra sesion borrando su informacion del localstorage
     */
 //    Se manejaran las solicitudes de manera asincrona para evitar
 //    que se realentice la aplicación
@@ -40,19 +47,25 @@ export const useAuthStore = defineStore('usuario', () => {
                 'http://localhost/GeneradorDeRecetas/Backend/Process/LogIn.php',
                 {email, password}, // Datos que recibirá el php
                 {withCredentials: true});
-            if (respuesta.data.success){
+
+            if (respuesta.data && respuesta.data.success){
                 // Si la respuesta es exitosa guardamos al usuario en formato json
-                usuario.value = {
+                const datosUsuario = {
                     id_usuario: respuesta.data.id_usuario,
                     nombre: respuesta.data.nombre,
                     peso: respuesta.data.peso,
                     altura: respuesta.data.altura
                 };
                 estaAutenticado.value = true;
+                errorMensaje.value = null;
+                usuario.value = datosUsuario;
+
+                // Guardar al usuario en el localstorage del navegador
+                localStorage.setItem('usuario_sesion', JSON.stringify(datosUsuario));
                 return true;
             } else {
                 // Si el PHP dijo success: false (contraseña incorrecta, etc.)
-                errorMensaje.value = respuesta.data.message || "Credenciales incorrectas";
+                errorMensaje.value = respuesta.data.error || "Credenciales incorrectas";
                 return false;
             }
         } catch (error) {
@@ -112,7 +125,7 @@ export const useAuthStore = defineStore('usuario', () => {
                 // Deberia retornar true
                 return exitologin;
             } else {
-                errorMensaje.value = respuesta.data.message || "Error al registrar el usuario";
+                errorMensaje.value = respuesta.data.error || "Error al registrar el usuario";
                 return false;
             }
         } catch (error) {
@@ -123,14 +136,25 @@ export const useAuthStore = defineStore('usuario', () => {
             cargando.value = false;
         }
    }
+   const logout = () => {
+        // Limpiamos los estados reactivos en la memoria de Vue
+        usuario.value = null;
+        estaAutenticado.value = false;
+        errorMensaje.value = null;
+
+        // Borramos el rastro físico en el navegador
+        localStorage.removeItem('usuario_sesion');
+    };
 //    Retornar los estados y metodos para usarlos desde la vista
    return {
     usuario,
     estaAutenticado,
     cargando,
     errorMensaje,
+    datosIMC,
     login,
     check,
-    registro
+    registro,
+    logout
    }
 })
