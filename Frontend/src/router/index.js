@@ -15,25 +15,25 @@ const routes = [
         path: '/',
         name: 'inicio',
         component: InicioView,
-        meta: { requiereAuth: true } // Privada
+        meta: { requiereAuth: true } 
     },
     {
         path: '/generador',
         name: 'generador',
         component: GeneradorView,
-        meta: { requiereAuth: true } // Privada
+        meta: { requiereAuth: true } 
     },
     {
         path: '/login',
         name: 'login',
         component: LoginView,
-        meta: { soloInvitados: true } // Publica (Solo Invitados)
+        meta: { soloInvitados: true } 
     },
     {
         path: '/registro',
         name: 'registro',
         component: RegistroView,
-        meta: { soloInvitados: true } // Publica (Solo Invitados)
+        meta: { soloInvitados: true } 
     },
     {
         // Ruta comodín: Si escriben cualquier cosa aleatoria en la URL, los manda al inicio
@@ -57,17 +57,19 @@ router.beforeEach(async (to, from, next) => {
 
     const autenticado = authStore.estaAutenticado;
 
-    // Caso 1: La ruta requiere autenticación y el usuario NO está logueado
+    // Si la ruta requiere autenticación y el usuario no está logueado
+    // lo manda a la pantalla de login
     if (to.meta.requiereAuth && !autenticado) {
-        return next({ name: 'login' }); // Rebotado al login
+        return next({ name: 'login' }); 
     }
 
-    // Caso 2: La ruta es para invitados (Login/Registro) y el usuario YA está logueado
+    // Si la ruta es para invitados (Login/Registro) y el usuario ya está logueado
+    // lo redirige a la pantalla principal
     if (to.meta.soloInvitados && autenticado) {
-        return next({ name: 'inicio' }); // Redirigido a la página principal
+        return next({ name: 'inicio' }); 
     }
 
-    // Caso 3: Cumple los requisitos o es una ruta libre. ¡Adelante!
+    // Caso 3: Cumple los requisitos o es una ruta libre.
     next();
 });
 

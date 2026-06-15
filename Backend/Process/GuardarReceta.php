@@ -107,7 +107,7 @@ $stmt_insertar = $mysqli->prepare($query_insercion);
 
 foreach($ingredientes_usuario as $ingrediente){
     // Si el ingrediente no tiene un entero de id debe tener null
-    if(!is_null($ingrediente['id'])){
+    if(isset($ingrediente['id']) && !is_null($ingrediente['id']) && $ingrediente['id'] !== ''){
         $lista_ids_productos[] = (int)$ingrediente['id'];
     } else {
         // El ingrediente debe ser insertado
@@ -126,7 +126,9 @@ foreach($ingredientes_usuario as $ingrediente){
         if(!$stmt_insertar->execute()){
             echo json_encode([
                 "success" => false,
-                "message" => "No se pudo registrar el ingrediente " . $nombre_revisado
+                "message" => "No se pudo registrar el ingrediente " . $nombre_revisado,
+                "error_mysql" => $stmt_insertar->error,
+                "datos_recibidos" => $ingrediente
             ]);
             exit;
         } else {
