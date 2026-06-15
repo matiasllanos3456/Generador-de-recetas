@@ -25,7 +25,7 @@ const quitarDelCarrito = (id) => {
 
 const procesarGeneracionReceta = () => {
   alert(`¡Enviando ${ingredientesSeleccionados.value.length} ingredientes al backend PHP para procesar con IA!`);
-  // Aquí irá el Axios.post del algoritmo mañana domingo.
+  // Aquí se hará la solicitud POST al action de generaReceta() del store del ingrediente
 };
 </script>
 

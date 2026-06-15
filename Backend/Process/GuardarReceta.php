@@ -1,8 +1,10 @@
-<!-- Si un ingrediente no tiene id, por que viene de la
-api de USDA primero se ingresará el ingrediente en la tabla
-Ingrediente y posteriormente se creará una instancia en la tabla intermedia IngredienteReceta-->
-<!-- El id del usuario debe quedar guardado en una variable $_SESSION -->
 <?php
+/*
+ Si un ingrediente no tiene id, por que viene de la
+ api de USDA primero se ingresará el ingrediente en la tabla
+ Ingrediente y posteriormente se creará una instancia en la tabla intermedia IngredienteReceta-->
+ El id del usuario debe quedar guardado en una variable $_SESSION 
+*/
 // Se obtendrán los siguientes datos
 /*
 {
@@ -17,6 +19,15 @@ Ingrediente y posteriormente se creará una instancia en la tabla intermedia Ing
     nombre: ""
 }
 */
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Content-Type: application/json; charset=UTF-8");
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
 function cargarEnv($ruta) {
     if (!file_exists($ruta)) return;
     $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

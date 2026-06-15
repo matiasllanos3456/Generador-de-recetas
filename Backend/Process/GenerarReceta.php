@@ -1,25 +1,32 @@
-<!-- Se utilizará la api de gemini para generar la receta
- según los ingredientes que se le pasaran desde la interfaz -->
-
 <?php
-// El script recibirá un array de ingredientes con su nombre y macronutrientes en formato json.
-// Ademas de la altura y el peso del usuario para recomendaciones
-// basadas en su IMC.
-// ejemplo:
-// {
-//  "peso": 80.0,
-//  "altura": 1.75,
-//  "ingredientes": [
-//    { "nombre": "Pechuga de pollo", "calorias": 165, "proteinas": 31, "carbohidratos": 0, "grasas saturadas": 3.6, "grasas monoinsaturadas": 3.42, "azucares": 1.44 },
-//    { "nombre": "Arroz integral", "calorias": 111, "proteinas": 2.6, "carbohidratos": 23, "grasas saturadas": 0.9, "grasas monoinsaturadas": 4.12, "azucares": 0 }
-//  ]
-//}
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+/*
+ Se utilizará la api de gemini para generar la receta
+ según los ingredientes que se le pasaran desde la interfaz 
 
-// Cargar variables de entorno para obtener la Api key de gemini
+ El script recibirá un array de ingredientes con su nombre y macronutrientes en formato json.
+ Ademas de la altura y el peso del usuario para recomendaciones
+ basadas en su IMC.
+ ejemplo:
+ {
+  "peso": 80.0,
+  "altura": 1.75,
+  "ingredientes": [
+    { "nombre": "Pechuga de pollo", "calorias": 165, "proteinas": 31, "carbohidratos": 0, "grasas saturadas": 3.6, "grasas monoinsaturadas": 3.42, "azucares": 1.44 },
+    { "nombre": "Arroz integral", "calorias": 111, "proteinas": 2.6, "carbohidratos": 23, "grasas saturadas": 0.9, "grasas monoinsaturadas": 4.12, "azucares": 0 }
+  ]
+}
+*/
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
+// Cargar variables de entorno para obtener la Api key de groq
 function cargarEnv($ruta) {
     if (!file_exists($ruta)) return;
     $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -73,15 +80,7 @@ foreach ($ingredientes as $ing) {
     $fat2    = $ing['grasas monoinsaturadas'] ?? 0;
     $sugar  = $ing['azucares'] ?? 0;
 
-    // Acumulamos los totales disponibles por si queremos usarlos en el contexto
-    $totalCalorias += $cal;
-    $totalProteinas += $prot;
-    $totalCarbos += $carb;
-    $totalGrasasSat += $fat;
-    $totalGrasasMon += $fat2;
-    $totalAzucares += $sugar;
-
-    // Creamos una línea descriptiva que Gemini entenderá a la perfección
+    // Creamos una línea descriptiva que Groq pueda entender correctamente
     $ingredientesTextoParaIA .= "- {$nombre} (Macros: {$cal} kcal, Prot: {$prot}g, Carbo: {$carb}g, Grasas saturadas: {$fat}g, Grasas monoinsaturadas: {$fat2}g Azucares: {$sugar})\n";
 }
 

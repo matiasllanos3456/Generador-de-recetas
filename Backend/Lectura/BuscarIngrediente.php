@@ -1,13 +1,15 @@
-<!-- Este script devolverá la informacion especifica de los ingredientes pedidos por el usuario -->
-<!-- En principio la informacion que se manejará
-en este script vendrá de la interfaz de Vue--> 
- <!-- El script de abajo devuelve la información del ingrediente
-  por lo que funciona como api, recibe una solicitud http y devuelve json -->
-<!-- -------------------------------------- -->
-
-<!-- Este script recibira 2 valores por parte del usuario:
-    el nombre del ingrediente y la confirmacion para mostrar ingredientes internacionales utilizando la api de USDA-->
 <?php
+/*
+ Este script devolverá la informacion especifica de los ingredientes pedidos por el usuario 
+ En principio la informacion que se manejará
+ en este script vendrá de la interfaz de Vue
+ El script de abajo devuelve la información del ingrediente
+ por lo que funciona como api, recibe una solicitud http y devuelve json
+
+ Este script recibira 2 valores por parte del usuario:
+ el nombre del ingrediente y la confirmacion para mostrar ingredientes internacionales utilizando la api de USDA
+*/
+
 // Cabeceras obligatorias para que Thunder Client y Vue lo lean como JSON
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
@@ -42,7 +44,7 @@ if (!$usda_key) {
 // Obtener el ingrediente desde la interfaz (Thuder client en este caso)
 $ingrediente = isset($_GET['search']) ? trim($_GET['search']) : 'milk';
 // Obtener confirmacion para mostrar ingredientes internacionales (api de USDA)
-$internacional = (isset($_GET['internacional']) && $_GET['internacional'] === true);
+$internacional = (isset($_GET['internacional']) && ($_GET['internacional'] === true || $_GET['internacional'] === 'true'));
 
 // -----------------------------------------------------
 // 1) Se consulta a la base de datos
@@ -166,7 +168,10 @@ if($internacional){ // Si se habilitó el internacional se procederá a buscar c
     }
 
     if (empty($ingredientesEncontrados)) {
-        echo json_encode(["mensaje" => "No se encontraron alimentos para esa palabra"]);
+        echo json_encode([
+            "message" => "No se encontraron alimentos para esa palabra",
+            "success" => false
+        ]);
         exit;
     }
 
