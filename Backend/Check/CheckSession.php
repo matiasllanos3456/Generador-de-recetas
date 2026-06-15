@@ -1,7 +1,9 @@
-<!-- Se verifica si el usuario ya ha iniciado sesion,
+<?php
+/*
+ Se verifica si el usuario ya ha iniciado sesion,
  esto para evitar que al recargar la pagina se tenga que
- iniciar sesion denuevo-->
- <?php
+ iniciar sesion denuevo
+*/
 // Permitir que Vue (en localhost:5173) lea este script y comparta cookies
 header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");

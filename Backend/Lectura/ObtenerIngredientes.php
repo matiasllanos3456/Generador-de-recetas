@@ -1,11 +1,22 @@
-<!-- Aqui se retornarán ingredientes comunes
- guardados en la base de datos para mostrar en 
- la interfaz y no depender tanto de la api de USDA -->
 <?php
+/*
+ Aqui se retornarán ingredientes comunes
+ guardados en la base de datos para mostrar en 
+ la interfaz y no depender tanto de la api de USDA 
+*/
+// Permitir que el frontend de desarrollo pueda comunicarse correctamente con este archivo
+header("Access-Control-Allow-Origin: http://localhost:5173");
+// Permitir el paso de cookies y sesiones compartidas
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET");
 
+// Responder inmediatamente a las peticiones pre-flight (OPTIONS) que hace Axios
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
 // 1. Cargar variables de entorno (.env)
 function cargarEnv($ruta) {
     if (!file_exists($ruta)) return;

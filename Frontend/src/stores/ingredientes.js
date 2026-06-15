@@ -48,6 +48,13 @@ export const useIngredientesStore = defineStore('ingredientes', () => {
         }
 
     });
+
+    // Estados para manejar ingredientes internacionales
+    // Se utilizarán en la barra de navegacion
+    const textoBusqueda = ref('');
+    const esInternacional = ref(false);
+    const resultadosBusqueda = ref([]);
+
     const cargando = ref(false);
     const errorMensaje = ref(null);
 
@@ -89,6 +96,7 @@ export const useIngredientesStore = defineStore('ingredientes', () => {
             const respuesta = await axios.get(
                 'http://localhost/GeneradorDeRecetas/Backend/Lectura/ObtenerIngredientes.php',
                 {withCredentials: true});
+            console.log(respuesta.data);
             // Si devuelve un array con ingredientes está bien
             if(Array.isArray(respuesta.data)){
                 listaIngredientes.value = respuesta.data;
@@ -227,6 +235,7 @@ export const useIngredientesStore = defineStore('ingredientes', () => {
             );
             // Si se encuentran los ingredientes se guardan en un array
             if (respuesta.data && Array.isArray(respuesta.data)) {
+                // Esto se deberá guardar en un componente de vue
                 return respuesta.data;
             } else if (respuesta.data.success === false) {
                 errorMensaje.value = respuesta.data.message || "No se encontraron ingredientes internacionales.";
@@ -257,8 +266,12 @@ export const useIngredientesStore = defineStore('ingredientes', () => {
         errorMensaje,
         recetaGenerada,
         obtenerPorCategoria,
+        textoBusqueda,
+        esInternacional,
+        resultadosBusqueda,
         cargarIngredientes,
         agregarIngrediente,
+        quitarIngrediente,
         generarReceta,
         guardarReceta,
         buscarIngrediente
