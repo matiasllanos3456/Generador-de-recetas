@@ -10,12 +10,18 @@
  el nombre del ingrediente y la confirmacion para mostrar ingredientes internacionales utilizando la api de USDA
 */
 
-// Cabeceras obligatorias para que Thunder Client y Vue lo lean como JSON
+// Cabeceras obligatorias para que Vue lo lea correctamente
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET");
 
-// 1. Cargar las variables de entorno manualmente (como lo planeamos)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
+// Cargar las variables de entorno manualmente (como lo planeamos)
 function cargarEnv($ruta) {
     if (!file_exists($ruta)) return;
     $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -34,7 +40,7 @@ $pass = getenv('DB_PASS');
 $name = getenv('DB_NAME');
 $port = getenv('DB_PORT');
 
-// Obtener la API Key de la USDA de forma segura
+// Obtener la API Key de la USDA 
 $usda_key = getenv('USDA_API_KEY');
 
 if (!$usda_key) {

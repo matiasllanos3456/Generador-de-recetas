@@ -20,8 +20,8 @@ const ejecutarFiltro = async () => {
 watch(() => ingredienteStore.textoBusqueda, ejecutarFiltro);
 watch(() => ingredienteStore.esInternacional, ejecutarFiltro);
 
-const manejarLogout = () => {
-  authStore.logout();
+const manejarLogout = async () => {
+  await authStore.logout();
   router.push({ name: 'login' });
 };
 </script>
@@ -29,7 +29,7 @@ const manejarLogout = () => {
 <template>
   <nav class="navbar">
     <div class="nav-brand">
-      <span class="logo-icon">🥑</span>
+      <span class="logo-icon"></span>
       <h2>RecetApp</h2>
     </div>
 

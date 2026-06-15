@@ -136,15 +136,26 @@ export const useAuthStore = defineStore('usuario', () => {
             cargando.value = false;
         }
    }
-   const logout = () => {
-        // Limpiamos los estados reactivos en la memoria de Vue
-        usuario.value = null;
-        estaAutenticado.value = false;
+   const logout = async () => {
         errorMensaje.value = null;
 
-        // Borramos el rastro físico en el navegador
-        localStorage.removeItem('usuario_sesion');
-    };
+        try {
+            await axios.post(
+                'http://localhost/GeneradorDeRecetas/Backend/Process/LogOut.php', 
+                {},
+                { withCredentials: true }
+            );
+        } catch (error) {
+            console.error("Error al avisar el cierre de sesión al backend:", error);
+        } finally {
+            // Limpiamos los estados reactivos en la memoria de Vue
+            usuario.value = null;
+            estaAutenticado.value = false;
+
+            // Borramos la informacion del localstorage
+            localStorage.removeItem('usuario_sesion');
+        }
+    }
 //    Retornar los estados y metodos para usarlos desde la vista
    return {
     usuario,

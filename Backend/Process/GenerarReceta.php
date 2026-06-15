@@ -100,6 +100,7 @@ if ($peso > 0 && $altura > 0) {
 $prompt = "Crea una receta saludable utilizando obligatoriamente algunos o todos estos ingredientes: {$ingredientesTextoParaIA}.
 Cada ingrediente viene con sus macronutrientes por cada 100 gramos para que tu no inventes ninguno.
 Si no se te proporcionan los gramos de un ingrediente tu decides cuantos gramos utilizar. {$contextoSalud}. 
+Los ingredientes provienen de bases de datos mixtas (locales e internacionales). Algunos nombres pueden ser largos o estar en inglés. Debes limpiarlos y traducirlos/adaptarlos al español en tu respuesta final.
 
 Tu respuesta debe ser exclusivamente un objeto JSON válido, sin textos introductorios ni bloques de código markdown como ```json. Debe tener la siguiente estructura exacta:
 {
