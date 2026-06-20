@@ -66,16 +66,31 @@ const procesarGeneracionReceta = async () => {
   top: 30px; /* Se queda flotando elegantemente al hacer scroll */
 }
 
-h3 { color: #064e3b; margin-top: 0; border-bottom: 2px solid #ecfdf5; padding-bottom: 10px; }
+h3 { 
+  color: #064e3b; 
+  margin-top: 0; 
+  border-bottom: 2px solid #ecfdf5; 
+  padding-bottom: 10px; 
+}
 
 .carrito-vacio {
   text-align: center;
   padding: 40px 10px;
   color: #94a3b8;
 }
-.basket-icon { font-size: 40px; display: block; margin-bottom: 10px; }
-.carrito-vacio p { margin: 5px 0; font-weight: bold; color: #64748b; }
-.carrito-vacio small { font-size: 12px; }
+.basket-icon { 
+  font-size: 40px; 
+  display: block; 
+  margin-bottom: 10px; 
+}
+.carrito-vacio p { 
+  margin: 5px 0; 
+  font-weight: bold; 
+  color: #64748b; 
+}
+.carrito-vacio small { 
+  font-size: 12px; 
+}
 
 .lista-seleccionados {
   list-style: none;
@@ -98,9 +113,20 @@ h3 { color: #064e3b; margin-top: 0; border-bottom: 2px solid #ecfdf5; padding-bo
   border: 1px solid #edf2f7;
 }
 
-.item-info { display: flex; flex-direction: column; }
-.item-name { font-size: 13px; font-weight: 600; color: #334155; text-transform: capitalize; }
-.item-kcal { font-size: 11px; color: #94a3b8; }
+.item-info { 
+  display: flex; 
+  flex-direction: column; 
+}
+.item-name { 
+  font-size: 13px; 
+  font-weight: 600; 
+  color: #334155; 
+  text-transform: capitalize; 
+}
+.item-kcal { 
+  font-size: 11px; 
+  color: #94a3b8; 
+}
 
 .btn-remove {
   background: none;
@@ -111,7 +137,9 @@ h3 { color: #064e3b; margin-top: 0; border-bottom: 2px solid #ecfdf5; padding-bo
   border-radius: 4px;
   transition: background 0.2s;
 }
-.btn-remove:hover { background: #fee2e2; }
+.btn-remove:hover { 
+  background: #fee2e2; 
+}
 
 .btn-generar {
   width: 100%;
@@ -127,7 +155,15 @@ h3 { color: #064e3b; margin-top: 0; border-bottom: 2px solid #ecfdf5; padding-bo
   transition: background 0.2s, transform 0.1s;
   box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
 }
-.btn-generar:hover:not(:disabled) { background: #059669; transform: translateY(-1px); }
-.btn-generar:active { transform: translateY(0); }
-.btn-generar:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-generar:hover:not(:disabled) { 
+  background: #059669; 
+  transform: translateY(-1px); 
+}
+.btn-generar:active { 
+  transform: translateY(0); 
+}
+.btn-generar:disabled { 
+  opacity: 0.6; 
+  cursor: not-allowed; 
+}
 </style>
